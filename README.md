@@ -69,7 +69,9 @@ Cloudflare 后台 → **Workers 和 Pages** → **D1 SQL 数据库** → 创建�
 
 ### 5. 设置 Secrets
 
-在 Worker 的 **设置 → 变量和机密** 里添加（或用 `npx wrangler secret put <名字>`）：
+在 Worker 的 **设置 → 运行时变量和密钥** 里添加（或用 `npx wrangler secret put <名字>`）：
+
+> ⚠️ 必须选 **「生产」** 环境添加，且添加/修改后要点击 **保存并部署** 才生效；只填进编辑框没保存，线上读不到，登录会一直报「密码错误」。
 
 | Secret | 说明 |
 |---|---|
@@ -81,7 +83,15 @@ Cloudflare 后台 → **Workers 和 Pages** → **D1 SQL 数据库** → 创建�
 | `R2_ACCESS_KEY_ID` | 第 2 步的 Key ID |
 | `R2_SECRET_ACCESS_KEY` | 第 2 步的 Secret |
 
-> 所有需要填的值都在 Secrets 里，`wrangler.toml` 无需修改。
+> 所有需要填的值都在 Secrets 里，`wrangler.toml` 无需修改（其中 `[vars]` 只有 `R2_BUCKET` 一项，值须与 R2 存储桶名一致）。
+
+**登录排错（按提示对号入座）**
+
+| 现象 | 原因 |
+|---|---|
+| 一直提示「密码错误」 | `ADMIN_PASSWORD` 未添加到运行时变量（生产），或添加后未保存并部署 |
+| 密码正确却提示「登录失败」 | `SESSION_SECRET` 缺失：密码已通过校验，但生成会话签名时报错 |
+| 能登录，但文件列表加载失败 | 其余变量（`CF_ACCOUNT_ID` / `D1_*` / `R2_*`）未补齐或填错；进面板「设置」页看自检哪项是 ❌ |
 
 ## 自动部署（推荐）
 
